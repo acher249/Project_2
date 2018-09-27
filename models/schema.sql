@@ -3,3 +3,14 @@ CREATE DATABASE exampledb;
 
 DROP DATABASE IF EXISTS testdb;
 CREATE DATABASE testdb;
+
+use exampledb;
+
+CREATE TABLE Dancers (
+	id INT AUTO_INCREMENT NOT NULL,
+    username VARCHAR(128) NOT NULL,
+    ans1 INT NOT NULL,
+    ans2 INT NOT NULL,
+    ans3 INT NOT NULL,
+    PRIMARY KEY (id)
+);
