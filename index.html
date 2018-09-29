@@ -1,119 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - FBX loader</title>
+		<title>three.js - pointerlock controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
+			html, body {
 				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
+				height: 100%;
 			}
-			#info a {
-				color: #046;
-				font-weight: bold;
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				overflow: hidden;
+				font-family: arial;
+			}
+			#blocker {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,0.5);
+			}
+			#instructions {
+				width: 100%;
+				height: 100%;
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+				color: #ffffff;
+				text-align: center;
+				cursor: pointer;
 			}
 		</style>
 	</head>
-
 	<body>
-
 		<script src="./threeJs/three.min.js"></script>
+		<script src="./threeJs/PointerLockControls.js"></script>
 
 		<script src="./threeJs/inflate.min.js"></script>
 		<script src="./threeJs/FBXLoader.js"></script>
 
-		<script src="./threeJs/OrbitControls.js"></script>
-
 		<script src="./threeJs/WebGL.js"></script>
 		<script src="./threeJs/stats.min.js"></script>
+
+		<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:40px">Click to play</span>
+				<br />
+				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+			</div>
+
+		</div>
 
 		<script>
 			if ( WEBGL.isWebGLAvailable() === false ) {
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 			}
+
 			var container, stats, controls;
-			var camera, scene, renderer, light;
 			var clock = new THREE.Clock();
 			var mixers = [];
 			var mixers2 = [];
+
+
+			var camera, scene, renderer, controls;
+			var objects = [];
+			var raycaster;
+			var moveForward = false;
+			var moveBackward = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var canJump = false;
+			var prevTime = performance.now();
+			var velocity = new THREE.Vector3();
+			var direction = new THREE.Vector3();
+			var vertex = new THREE.Vector3();
+			var color = new THREE.Color();
+
+
+			// initialization
 			init();
+			LoadDancerOne();
+			LoadDancerTwo();
+			animateDancerOne();
+			animateDancerTwo();
 			animate();
-			FbxTwo();
-
-
-			function init() {
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 100, 200, 300 );
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 100, 0 );
-				controls.update();
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
-				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 200, 0 );
-				scene.add( light );
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 200, 100 );
-				light.castShadow = true;
-				light.shadow.camera.top = 180;
-				light.shadow.camera.bottom = -100;
-				light.shadow.camera.left = -120;
-				light.shadow.camera.right = 120;
-				scene.add( light );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
-				// ground
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
-				grid.material.opacity = 0.2;
-				grid.material.transparent = true;
-				scene.add( grid );
+			
+			
+			function LoadDancerOne() {
+				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/BboyUprock.fbx', function ( object ) {
-					object.mixer = new THREE.AnimationMixer( object );
-					mixers.push( object.mixer );
-					var action = object.mixer.clipAction( object.animations[ 0 ] );
-					action.play();
-					object.traverse( function ( child ) {
+				loader.load( './threeJs/BboyUprock.fbx', function ( object2 ) {
+					object2.mixer = new THREE.AnimationMixer( object2 );
+					mixers.push( object2.mixer );
+					var action2 = object2.mixer.clipAction( object2.animations[ 0 ] );
+					action2.play();
+					object2.traverse( function ( child ) {
 						if ( child.isMesh ) {
 							child.castShadow = true;
 							child.receiveShadow = true;
 						}
 					} );
-					scene.add( object );
+					scene.add( object2 );
+					object2.translateZ( 0 );//change position
 				} );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
-				window.addEventListener( 'resize', onWindowResize, false );
-				// stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
 			}
 
-			function FbxTwo() {
+			function LoadDancerTwo() {
 				
 				// model
 				var loader = new THREE.FBXLoader();
@@ -129,9 +133,152 @@
 						}
 					} );
 					scene.add( object2 );
-					object2.translateZ( 100 );
+					object2.translateZ( 100 );//change position
 				} );
 			}
+
+			function animateDancerOne() {
+				requestAnimationFrame( animateDancerOne );
+				if ( mixers.length > 0 ) {
+					for ( var i = 0; i < mixers.length; i ++ ) {
+						mixers[ i ].update( clock.getDelta());
+					}
+				}
+				renderer.render( scene, camera );
+			}
+
+			function animateDancerTwo() {
+				requestAnimationFrame( animateDancerTwo );
+				if ( mixers2.length > 0 ) {
+					for ( var i = 0; i < mixers2.length; i ++ ) {
+						mixers2[ i ].update( clock.getDelta()*10);
+					}
+				}
+				renderer.render( scene, camera );
+			}
+
+
+			function init() {
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
+				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+				light.position.set( 0.5, 1, 0.75 );
+				scene.add( light );
+				controls = new THREE.PointerLockControls( camera );
+				var blocker = document.getElementById( 'blocker' );
+				var instructions = document.getElementById( 'instructions' );
+				instructions.addEventListener( 'click', function ( event ) {
+					controls.lock();
+				}, false );
+				controls.addEventListener( 'lock', function() {
+					instructions.style.display = 'none';
+					blocker.style.display = 'none';
+				} );
+				controls.addEventListener( 'unlock', function() {
+					blocker.style.display = 'block';
+					instructions.style.display = '';
+				} );
+				scene.add( controls.getObject() );
+				var onKeyDown = function ( event ) {
+					switch ( event.keyCode ) {
+						case 38: // up
+						case 87: // w
+							moveForward = true;
+							break;
+						case 37: // left
+						case 65: // a
+							moveLeft = true; break;
+						case 40: // down
+						case 83: // s
+							moveBackward = true;
+							break;
+						case 39: // right
+						case 68: // d
+							moveRight = true;
+							break;
+						case 32: // space
+							if ( canJump === true ) velocity.y += 350;
+							canJump = false;
+							break;
+					}
+				};
+				var onKeyUp = function ( event ) {
+					switch( event.keyCode ) {
+						case 38: // up
+						case 87: // w
+							moveForward = false;
+							break;
+						case 37: // left
+						case 65: // a
+							moveLeft = false;
+							break;
+						case 40: // down
+						case 83: // s
+							moveBackward = false;
+							break;
+						case 39: // right
+						case 68: // d
+							moveRight = false;
+							break;
+					}
+				};
+				document.addEventListener( 'keydown', onKeyDown, false );
+				document.addEventListener( 'keyup', onKeyUp, false );
+				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+				// floor
+				var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+				floorGeometry.rotateX( - Math.PI / 2 );
+				// vertex displacement
+				var position = floorGeometry.attributes.position;
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
+					vertex.fromBufferAttribute( position, i );
+					vertex.x += Math.random() * 20 - 10;
+					vertex.y += Math.random() * 2;
+					vertex.z += Math.random() * 20 - 10;
+					position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+				}
+				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+				position = floorGeometry.attributes.position;
+				var colors = [];
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
+					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					colors.push( color.r, color.g, color.b );
+				}
+				floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				scene.add( floor );
+				// objects
+				var boxGeometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
+				position = boxGeometry.attributes.position;
+				colors = [];
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
+					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					colors.push( color.r, color.g, color.b );
+				}
+				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				for ( var i = 0; i < 500; i ++ ) {
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
+					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+					scene.add( box );
+					objects.push( box );
+				}
+				//
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
 
 			function onWindowResize() {
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -139,23 +286,40 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 			}
 
-			//Need different amnimation mixer aray for each animation
+
 			function animate() {
 				requestAnimationFrame( animate );
-				if ( mixers.length > 0 ) {
-					for ( var i = 0; i < mixers.length; i ++ ) {
-						mixers[ i ].update( clock.getDelta());
+				if ( controls.isLocked === true ) {
+					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.y -= 10;
+					var intersections = raycaster.intersectObjects( objects );
+					var onObject = intersections.length > 0;
+					var time = performance.now();
+					var delta = ( time - prevTime ) / 1000;
+					velocity.x -= velocity.x * 10.0 * delta;
+					velocity.z -= velocity.z * 10.0 * delta;
+					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+					direction.z = Number( moveForward ) - Number( moveBackward );
+					direction.x = Number( moveLeft ) - Number( moveRight );
+					direction.normalize(); // this ensures consistent movements in all directions
+					if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+					if ( onObject === true ) {
+						velocity.y = Math.max( 0, velocity.y );
+						canJump = true;
 					}
-				}
-				if ( mixers2.length > 0 ) {
-					for ( var i = 0; i < mixers2.length; i ++ ) {
-						mixers2[ i ].update( clock.getDelta() *150/* animation speed multiplier*/ ); //120
+					controls.getObject().translateX( velocity.x * delta );
+					controls.getObject().translateY( velocity.y * delta );
+					controls.getObject().translateZ( velocity.z * delta );
+					if ( controls.getObject().position.y < 10 ) {
+						velocity.y = 0;
+						controls.getObject().position.y = 10;
+						canJump = true;
 					}
+					prevTime = time;
 				}
 				renderer.render( scene, camera );
-				stats.update();
 			}
 		</script>
-
 	</body>
 </html>
