@@ -1,4 +1,5 @@
 var db = require("../models");
+require("dotenv").config();
 
 module.exports = function(app) {
   // Load index page
@@ -20,8 +21,14 @@ module.exports = function(app) {
     });
   });
 
+  app.get("/spotify", function(req, res) {
+    res.send(process.env.SPOTIFY_ID);
+  });
+
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
     res.render("404");
   });
+
+
 };
