@@ -84,7 +84,7 @@
 				scene.add( grid );
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/Bboy Uprock.fbx', function ( object ) {
+				loader.load( './threeJs/BboyUprock.fbx', function ( object ) {
 					object.mixer = new THREE.AnimationMixer( object );
 					mixers.push( object.mixer );
 					var action = object.mixer.clipAction( object.animations[ 0 ] );
@@ -97,6 +97,22 @@
 					} );
 					scene.add( object );
 				} );
+
+				loader.load( './threeJs/HipHopDancing.fbx', function ( object ) {
+				object.mixer = new THREE.AnimationMixer( object );
+				mixers.push( object.mixer );
+				var action = object.mixer.clipAction( object.animations[ 0 ] );
+				action.play();
+				object.traverse( function ( child ) {
+					if ( child.isMesh ) {
+						child.castShadow = true;
+						child.receiveShadow = true;
+					}
+				} );
+				scene.add( object );
+				object.translateZ( 200 );
+				} );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
