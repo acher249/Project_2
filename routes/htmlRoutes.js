@@ -3,6 +3,16 @@ const https = require("https");
 
 require("dotenv").config();
 
+var generateRandomString = function(length) {
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
 module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
@@ -24,7 +34,12 @@ module.exports = function(app) {
   });
 
   app.get("/spotify", function(req, res) {
-    res.redirect('https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID + '&response_type=code&redirect_uri=https%3A%2F%2Fgoogle.com&scope=user-read-private%20user-read-email');
+    var state = generateRandomString(16);
+
+    var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
+    + '&response_type=code&redirect_uri=127.0.0.1:3000&scope=user-top-read&show_dialog=true&state=' + state;
+
+    res.redirect(spotify);
   });
 
   // Render 404 page for any unmatched routes
