@@ -16,14 +16,15 @@ module.exports = function(app) {
   });
 
   // Load example page and pass in an example by id
-  app.get("/example/:id", function(req, res) {
-    db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
-      res.render("example", {
-        example: dbExample
-      });
-    });
-  });
+  // app.get("/example/:id", function(req, res) {
+  //   db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
+  //     res.render("example", {
+  //       example: dbExample
+  //     });
+  //   });
+  // });
 
+  //SPOTIFY REDIRECT - Authorization (Step 1) = Application to Spotify Authorization
   app.get("/spotify", function(req, res) {
     var state = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -36,34 +37,42 @@ module.exports = function(app) {
     //stores local cookie with key auth_spotify_id and value of state
     res.cookie("auth_spotify_id", state);
 
+    //Backup Code
+    // var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
+    // + '&response_type=code&redirect_uri=https%3A%2F%2Flit-citadel-55735.herokuapp.com%2Fspotify-callback&scope=user-follow-read&show_dialog=true&state=' + state;
+
+    //Change Scope Here (Spotify API) - Current: user-follow-read
+
     var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
-    + '&response_type=code&redirect_uri=https%3A%2F%2Flit-citadel-55735.herokuapp.com%2Fcallback&scope=user-top-read&show_dialog=true&state=' + state;
+    + '&response_type=code&redirect_uri=https%3A%2F%2Flit-citadel-55735.herokuapp.com%2Fspotify-callback&scope=user-follow-read&show_dialog=true&state=' + state;
 
     res.redirect(spotify);
   });
 
-  app.get("/callback", function(req, res) {
+  //SPOTIFY POST REQUEST (Spotify Authorization Step 1 Redirects to /spotify-callback)- (Step 2)
+  //Spotify Authorization (Continued) to get Access_Token for user's Spotify API
+  app.get("/spotify-callback", function(req, res) {
     var code = req.query.code || null;
     var state = req.query.state || null; //the state we generated on the /spotify page
     var cookie = req.cookies ? req.cookies["auth_spotify_id"] : null;
 
-    //checks if the user is on the same browser (security)
+    //Checks if the User's Cookie has the same pregen State Key (Spotify Authorization - Check System)
     if(state === null || state !== cookie) {
-      res.redirect("/#INTERNAL_SERVER_ERROR");
+      res.send("<H1>INTERNAL SERVER ERROR</H1>")
     } else {
       res.clearCookie("auth_spotify_id");
 
-      //POST PARAMETERS (BODY)
+      //POST PARAMETERS - (BODY)
       const postData = querystring.stringify({
         "code": code.toString(),
-        "redirect_uri": "https://lit-citadel-55735.herokuapp.com/callback",
+        "redirect_uri": "https://lit-citadel-55735.herokuapp.com/spotify-callback",
         "grant_type": "authorization_code",
         "client_id": process.env.SPOTIFY_ID,
         "client_secret": process.env.SPOTIFY_SECRET
       });
 
-      //POST request - Making It
-      var request = https.request({
+      //POST PARAMETER - (OPTIONS)
+      var postRequest = {
         hostname: 'accounts.spotify.com',
         path: '/api/token',
         method: 'POST',
@@ -71,33 +80,36 @@ module.exports = function(app) {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         json: true
-      }, (response) => {
-        if(response.statusCode === 200) {
-          response.setEncoding('utf8'); //Not Sure
+      };
 
+      //POST request (FORMATION) - Putting it together using previous setup parameters (OPTIONS & BODY)
+      var request = https.request(postRequest, (response) => {
+        if(response.statusCode === 200) {
+          //POST request (RESPONSE)
+          //chunk = JSON Data response (must be parsed) with the Access_Token property that allows us to read a user's Spotify Data
           response.on('data', (chunk) => {
             var data = JSON.parse(chunk);
             console.log(data);
 
+            //GET request (Step 3) - Spotify API (w/ Access Token we received from the POST request response)
             var requestTwo = https.request({
               hostname: 'api.spotify.com',
-              path: '/v1/me/top/artists',
+              //Change Path to match Spotify API requirements (If you change Scopes Change this as well based on Spotify API Documentation)
+              path: '/v1/me/following?type=artist',
               method: 'GET',
               headers: {
                 'Authorization': 'Bearer ' + data.access_token
               },
               json: true
-            }, (callback) => {
-
+            }, (response) => {
               var rawData = '';
-              
-              callback.on('data', (chunk) => {
+              response.on('data', (chunk) => {
+                //When Data is Received, add it to empty variable
                 rawData += chunk;
-                res.send("Hopefully this Works!");
               });
-
-              callback.on('end', (chunk) => {
-                console.log("HELLO WORLD" + JSON.parse(rawData));
+              response.on('end', (chunk) => {
+                //When the response is finished, Display the JSON (Results *** Subject to Change based on How we use the Data ***)
+                res.send(JSON.parse(rawData));
               });
             });
 
@@ -105,16 +117,16 @@ module.exports = function(app) {
           });
 
         } else {
-          res.render("404");
+          res.send(response.statusCode);
         }
       });
 
       //POST Request - Writing the Data / Making the Call
       request.write(postData);
+
       //Closing Off the Request
       request.end();
-    }
-
+    };
   });
 
   // Render 404 page for any unmatched routes
