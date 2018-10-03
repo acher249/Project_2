@@ -3,6 +3,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mysql = require('./config/connection');
 var exphbs = require("express-handlebars");
+var cookie = require("cookie-parser");
+var cors = require('cors');
 
 var db = require("./models");
 
@@ -13,6 +15,7 @@ var PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
+app.use(express.static(__dirname + '/public')).use(cors()).use(cookie());
 
 // Handlebars
 app.engine(
