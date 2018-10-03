@@ -1,5 +1,6 @@
 var db = require("../models");
 
+// this is what displays to the user
 module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
@@ -21,7 +22,15 @@ module.exports = function(app) {
   });
 
   // Render 404 page for any unmatched routes
+  app.get("/game", function(req, res) {
+    res.render("game");
+    // res.send("HEY");
+  });
+
+  // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
     res.render("404");
   });
+
+
 };

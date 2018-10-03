@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<!-- turn this into a handelbars file -->
+		<!-- Get this to render at a route -->
 		<title>three.js - pointerlock controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -40,21 +42,33 @@
 				text-align: center;
 				cursor: pointer;
 			}
+
+			.backButton {
+				position: absolute;
+				display: block;
+				z-index: 99;
+				left: 2%;
+				top: 2%;
+			}
 		</style>
 	</head>
 	<body>
-		<script src="./threeJs/three.min.js"></script>
-		<script src="./threeJs/PointerLockControls.js"></script>
+		<script src="../threeJs/three.min.js"></script>
+		<script src="../threeJs/PointerLockControls.js"></script>
 
-		<script src="./threeJs/inflate.min.js"></script>
-		<script src="./threeJs/FBXLoader.js"></script>
+		<script src="../threeJs/inflate.min.js"></script>
+		<script src="../threeJs/FBXLoader.js"></script>
 
-		<script src="./threeJs/WebGL.js"></script>
-		<script src="./threeJs/stats.min.js"></script>
+		<script src="../threeJs/WebGL.js"></script>
+		<script src="../threeJs/stats.min.js"></script>
 
 		<div id="blocker">
 
 			<div id="instructions">
+				{{!-- <form action="/">
+					<input type="submit" value="Go to Google" />
+				</form> --}}
+				<button class="backButton" ><a href="/">Back To Dance Party Survey!!</a></button>
 				<span style="font-size:40px">Click to play</span>
 				<br />
 				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
