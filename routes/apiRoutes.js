@@ -1,4 +1,5 @@
 var db = require("../models");
+var mysql = require("../config/connection");
 
 //this is to get my data
 module.exports = function(app) {
@@ -8,6 +9,17 @@ module.exports = function(app) {
       res.json(dbExamples);
     });
   });
+
+  // read the database for questionaire.
+  app.get('/get', function (req, res) {
+    res.send(mysql.ask);
+  });
+
+  // post onto the database/post
+
+  app.post('/post', function (req, res) {
+    res.send(mysql.answer);
+  })
 
   // Create a new example
   app.post("/api/examples", function(req, res) {
