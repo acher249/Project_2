@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<!-- turn this into a handelbars file -->
+		<!-- Get this to render at a route -->
 		<title>three.js - pointerlock controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -40,6 +42,14 @@
 				text-align: center;
 				cursor: pointer;
 			}
+
+			.backButton {
+				position: absolute;
+				display: block;
+				z-index: 99;
+				left: 2%;
+				top: 2%;
+			}
 		</style>
 	</head>
 	<body>
@@ -55,6 +65,10 @@
 		<div id="blocker">
 
 			<div id="instructions">
+				<form method="get" action="/page2">
+					<button type="submit">Continue</button>
+				</form>
+				<button class="backButton" href="./views/layouts/main.handlebars"><a>Back To Dance Party Survey</a></button>
 				<span style="font-size:40px">Click to play</span>
 				<br />
 				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)

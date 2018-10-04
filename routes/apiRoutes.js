@@ -1,6 +1,7 @@
 var db = require("../models");
 var mysql = require("../config/connection");
 
+//this is to get my data
 module.exports = function(app) {
   // Get all examples
   app.get("/api/examples", function(req, res) {
