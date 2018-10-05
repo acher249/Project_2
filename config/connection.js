@@ -14,15 +14,15 @@ var ask = connection.query('SELECT 1 + 1 AS solution', function (err, rows, fiel
     console.log('The solution is: ', rows[0].solution);
 });
 
-var data = { id: 1, title: 'Hey William' };
+// var data = { id: 1, title: 'Hey William' };
 
-var answer = connection.query('INSERT INTO posts SET ?', data, function (error, results, fields) {
-    if (error) throw error;
-    // Neat!
-});
+// var answer = connection.query('INSERT INTO posts SET ?', data, function (error, results, fields) {
+//     if (error) throw error;
+//     // Neat!
+// });
 
 
 module.exports = connection;
 module.exports = ask;
-module.exports = answer;
+// module.exports = answer;
 
