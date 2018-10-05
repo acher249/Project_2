@@ -88,13 +88,17 @@
 			//need to add a new mixer for each dancer
 			var mixers = [];
 			var mixers2 = [];
-		  var mixers3 = [];
+		    var mixers3 = [];
         
 			var decodedJson = decodeURIComponent("{{{encodedJson}}}");
  			var jsonObj = JSON.parse(decodedJson);
 			
 			
 			console.log(jsonObj);
+
+			console.log(jsonObj.q1);
+
+		    //do things
 
 			var camera, scene, renderer, controls;
 			var objects = [];
@@ -147,7 +151,7 @@
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/BboyUprock.fbx', function ( object2 ) {
+				loader.load( './threeJs/Dancers/BreakDance.fbx', function ( object2 ) {
 					object2.mixer = new THREE.AnimationMixer( object2 );
 					mixers.push( object2.mixer );
 					var action2 = object2.mixer.clipAction( object2.animations[ 0 ] );
@@ -167,7 +171,7 @@
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/HipHopDancing.fbx', function ( object2 ) {
+				loader.load( './threeJs/Dancers/BreakDance(1).fbx', function ( object2 ) {
 					object2.mixer = new THREE.AnimationMixer( object2 );
 					mixers2.push( object2.mixer );
 					var action2 = object2.mixer.clipAction( object2.animations[ 0 ] );
@@ -187,7 +191,7 @@
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/BreakdanceFreezes.fbx', function ( object3 ) {
+				loader.load( './threeJs/Dancers/BreakDance(2).fbx', function ( object3 ) {
 					object3.mixer = new THREE.AnimationMixer( object3 );
 					mixers3.push( object3.mixer );
 					var action3 = object3.mixer.clipAction( object3.animations[ 0 ] );
