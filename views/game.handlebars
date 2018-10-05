@@ -88,13 +88,20 @@
 			//need to add a new mixer for each dancer
 			var mixers = [];
 			var mixers2 = [];
-		  var mixers3 = [];
+		    var mixers3 = [];
         
+			//jordan
 			var decodedJson = decodeURIComponent("{{{encodedJson}}}");
  			var jsonObj = JSON.parse(decodedJson);
 			
 			
 			console.log(jsonObj);
+
+			var q1 = jsonObj.q1
+			var q2 = jsonObj.q2
+
+			console.log(q1);
+
 
 			var camera, scene, renderer, controls;
 			var objects = [];
@@ -122,10 +129,6 @@
 			animate();
 			LoadEqui();
 
-
-			//*********  This will get data back from DB  *********//
-			//var sqlObject = mysql.ask();
-			//sqlObject.q1
 
 			function LoadEqui(){
 
