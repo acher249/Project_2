@@ -1,10 +1,12 @@
 require("dotenv").config();
 var express = require("express");
 var bodyParser = require("body-parser");
+// connection to the database is renamed to mysql. this is not the npm mysql package
 var mysql = require('./config/connection');
 var exphbs = require("express-handlebars");
 var cookie = require("cookie-parser");
 var cors = require('cors');
+var path = require('path');
 
 var db = require("./models");
 
