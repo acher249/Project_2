@@ -27,9 +27,6 @@ module.exports = function(app) {
   app.post('/questionaire', function (req, res) {
 
      var arrayOfAnswers = req.body.answers;
-
-     console.log(arrayOfAnswers);
-
      var answersSubmitted = {
          "q1": arrayOfAnswers[0],
          "q2": arrayOfAnswers[1],
@@ -39,22 +36,36 @@ module.exports = function(app) {
      }
 
      mysql.answer(answersSubmitted); //Submiting Form to the Database
-     var answersObject = mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
+     //var answersObject = mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
 
      console.log(answersSubmitted);
 
-     res.send("Hello World");
+     if(req.body.spotifycheck == undefined) {
+       connection.query('SELECT * from posts', function (err, rows, fields) {
+         if (err) throw err;
+         var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
+
+         var song; //youtube video id for the song
+         if(arrayOfAnswers[4] === "Salsa") { }
+         else if (arrayOfAnswers[4] === "Ballet") { }
+         else if (arrayOfAnswers[4] === "Breakdance") { }
+         else if (arrayOfAnswers[4] === "Old School") { }
+         else { } //salsa
+
+          // console.log("THIS IS JORDAN: ", answersObject);
+         res.render("game",{
+           encodedJson : answersObject //,
+           //youtube: song
+           //NEED TO ADD YOUTUBE LINK OF SALSA MUSIC
+         });
+
+       });
+     } else {
+       res.redirect("/spotify")
+     }
+     // console.log("THIS IS JORDAN: ", answersObject);
 
   });
-
-  // Load example page and pass in an example by id
-  // app.get("/example/:id", function(req, res) {
-  //   db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
-  //     res.render("example", {
-  //       example: dbExample
-  //     });
-  //   });
-  // });
 
   //SPOTIFY REDIRECT - Authorization (Step 1) = Application to Spotify Authorization
   app.get("/spotify", function(req, res) {
@@ -83,10 +94,12 @@ module.exports = function(app) {
     var code = req.query.code || null;
     var state = req.query.state || null; //the state we generated on the /spotify page
     var cookie = req.cookies ? req.cookies["auth_spotify_id"] : null;
-
+    console.log(req.query.error);
     //Checks if the User's Cookie has the same pregen State Key (Spotify Authorization - Check System)
     if(state === null || state !== cookie) {
       res.send("<H1>INTERNAL SERVER ERROR</H1>")
+    } else if (req.query.error === "access_denied") {
+      res.redirect("/");
     } else {
       res.clearCookie("auth_spotify_id");
 
@@ -151,7 +164,19 @@ module.exports = function(app) {
                    response.on('end', (chunk) => {
                     // res.send(JSON.parse(rawData).items[0].id.videoId);
                     var id = JSON.parse(rawData).items[0].id.videoId + "?autoplay=1"
-                    res.render("spotify", { uri: id });
+                    // res.render("spotify", { uri: id });
+
+                    //TESTING (WILL)
+                    connection.query('SELECT * from posts', function (err, rows, fields) {
+                      if (err) throw err;
+                      var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
+
+                       // console.log("THIS IS JORDAN: ", answersObject);
+                      res.render("gameTest",{
+                        encodedJson : answersObject,
+                        youtube: id
+                      });
+                    });
                   });
                 });
                 requestThree.end();

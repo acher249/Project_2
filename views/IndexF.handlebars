@@ -8,6 +8,13 @@
 		<link rel="stylesheet" href="FrontEnd/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="FrontEnd/assets/css/noscript.css" /></noscript>
 	</head>
+
+	<style>
+		#PostMethod {
+			margin-left:2%;
+		}
+	</style>
+
 	<body class="is-preload">
 
 		<!-- Sidebar -->
@@ -187,25 +194,35 @@
 
 					<!-- </section> -->
 
-				<form action="/questionaire" method="post">
-	       <label for="team_name">What's your age? </label><br>
-	           <input id="question" type="text" name="answers" value="Question1"><br>
-	       <label for="team_name">How many pieces of cake can you eat? </label><br>
-	           <input id="question" type="text" name="answers" value="Question2"><br>
-	       <label for="team_name">What is your favourite number? </label><br>
-	           <input id="question" type="text" name="answers" value="Question3"><br>
-	       <label for="team_name"> </label><br>
-	           <input id="question" type="text" name="answers" value="Question4"><br>
-	       <label for="team_name">What : </label><br>
-	           <input id="question" type="text" name="answers" value="Question5"><br>
-	       <input type="submit" value="Submit">
-   			</form>
+					<section>
+						<br>
+						<form action="/questionaire" method="post" id="PostMethod">
+						 <label for="questionOne">What is your Age? </label>
+						 <input type="text" name="answers" placeholder=""><br>
+
+						 <label for="questionTwo">How many slices of cake can you eat? </label>
+						 <input type="text" name="answers" placeholder=""><br>
+
+						 <label for="questionThree">What is your favorite Number? </label>
+						 <input type="text" name="answers" placeholder=""><br>
+
+						 <label for="questionFour">What is your favorite party environment? (Desert, Mountains, Snow, Woods)</label>
+						 <input type="text" name="answers" placeholder=""><br>
+
+						 <label for="questionFive">Pick a style of Dance (Salsa, Ballet, Breakdance or Old School)</label>
+						 <input type="text" name="answers" placeholder=""><br>
+
+						 <input type="checkbox" id="spotifycheck" name="spotifycheck" placeholder=""/><label for="spotifycheck"></label>Link Spotify Account?<br><br><br>
+
+						 <input type="submit" value="Submit">
+						</form>
+					</section>
 
 				<!-- Three -->
 					<section id="three" class="wrapper style1 fade-up">
 						<div class="inner">
 							<!-- Materialize Modal Trigger/Submit Button -->
-							<button type ="submit" data-target="modal1" class="waves-effect waves-light btn modal-trigger green lighten-1" id="submitBtn"><a href="/game">Lets Party</a></button>
+							<!-- <button type ="submit" data-target="modal1" class="waves-effect waves-light btn modal-trigger green lighten-1" id="submitBtn"><a href="/game">Lets Party</a></button> -->
 					</section>
 
 			</div>
