@@ -142,3 +142,15 @@ module.exports = function(app) {
   });
 
 };
+
+
+//amantest
+
+app.get("/abrole", function(req, res) {
+  db.Example.findAll({}).then(function(dbExamples) {
+    res.render("IndexF", {
+      msg: "Welcome!",
+      examples: dbExamples
+    });
+  });
+});
