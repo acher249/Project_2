@@ -88,9 +88,13 @@
 			//need to add a new mixer for each dancer
 			var mixers = [];
 			var mixers2 = [];
-		    var mixers3 = [];
-
-
+		  var mixers3 = [];
+        
+			var decodedJson = decodeURIComponent("{{{encodedJson}}}");
+ 			var jsonObj = JSON.parse(decodedJson);
+			
+			
+			console.log(jsonObj);
 
 			var camera, scene, renderer, controls;
 			var objects = [];

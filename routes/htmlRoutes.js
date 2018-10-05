@@ -1,8 +1,14 @@
 var db = require("../models");
 const https = require("https");
 const querystring = require('querystring');
-
+var mysql2 = require('mysql');
 var mysql = require('./../config/connection');
+
+var jawsDB_url = "mysql://vufgp4uhwqqydc4e:p8cyc6trad2lnqov@wvulqmhjj9tbtc1w.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/vdqo9zrekzetwm5e"
+//process.env.JAWSDB_URL
+
+var connection = mysql2.createConnection(jawsDB_url);
+connection.connect();
 
 require("dotenv").config();
 
@@ -33,7 +39,7 @@ module.exports = function(app) {
      }
 
      mysql.answer(answersSubmitted); //Submiting Form to the Database
-     mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
+     var answersObject = mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
 
      console.log(answersSubmitted);
 
@@ -155,12 +161,22 @@ module.exports = function(app) {
     };
   });
 
+  
+
   // Render 404 page for any unmatched routes
   app.get("/game", function(req, res) {
-    res.render("game");
+  
+    connection.query('SELECT * from posts', function (err, rows, fields) {
+      if (err) throw err;
+   var answersObject = encodeURIComponent(JSON.stringify(rows[0]));
+      
+   console.log("THIS IS JORDAN: ", answersObject);
+   res.render("game",{
+      encodedJson : answersObject
+     });
     // res.send("HEY");
   });
-
+  });
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
     res.render("404");
