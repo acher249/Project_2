@@ -37,10 +37,6 @@ module.exports = function(app) {
     //stores local cookie with key auth_spotify_id and value of state
     res.cookie("auth_spotify_id", state);
 
-    //Backup Code
-    // var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
-    // + '&response_type=code&redirect_uri=https%3A%2F%2Fdancepartysimulator.herokuapp.com%2Fspotify-callback&scope=user-follow-read&show_dialog=true&state=' + state;
-
     //Change Scope Here (Spotify API) - Current: user-follow-read
 
     var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
@@ -108,8 +104,6 @@ module.exports = function(app) {
               });
               response.on('end', (chunk) => {
                 //When the response is finished, Display the JSON (Results *** Subject to Change based on How we use the Data ***)
-                // res.send(JSON.parse(rawData).items[0].name);
-                // res.render("spotify", { uri: JSON.parse(rawData).items[0].uri });
 
                 var temp = JSON.parse(rawData).items[0].name.toString().split(" ").join("%20");
                 console.log("YOUTUBE: " + process.env.YOUTUBE_API);
@@ -126,7 +120,6 @@ module.exports = function(app) {
                   });
 
                   response.on('end', (chunk) => {
-                    // res.send(JSON.parse(rawData).items[0].id.videoId);
                     var id = JSON.parse(rawData).items[0].id.videoId + "?autoplay=1"
                     res.render("spotify", { uri: id });
                   });
@@ -152,9 +145,9 @@ module.exports = function(app) {
     };
   });
 
+  //MAIN
   app.get("/game", function(req, res) {
     res.render("game");
-    // res.send("HEY");
   });
 
   // Render 404 page for any unmatched routes
