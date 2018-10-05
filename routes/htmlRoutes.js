@@ -17,7 +17,7 @@ module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
     db.Example.findAll({}).then(function(dbExamples) {
-      res.render("IndexFTest", {
+      res.render("IndexF", {
         msg: "Welcome!",
         examples: dbExamples
       });
