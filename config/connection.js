@@ -15,7 +15,7 @@ var ask = connection.query('SELECT 1 + 1 AS solution', function (err, rows, fiel
 });
 
 // var data = { id: 1, title: 'Hey William' };
-
+//
 // var answer = connection.query('INSERT INTO posts SET ?', data, function (error, results, fields) {
 //     if (error) throw error;
 //     // Neat!
@@ -25,4 +25,3 @@ var ask = connection.query('SELECT 1 + 1 AS solution', function (err, rows, fiel
 module.exports = connection;
 module.exports = ask;
 // module.exports = answer;
-
