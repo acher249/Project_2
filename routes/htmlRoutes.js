@@ -168,9 +168,9 @@ module.exports = function(app) {
   
     connection.query('SELECT * from posts', function (err, rows, fields) {
       if (err) throw err;
-   var answersObject = encodeURIComponent(JSON.stringify(rows[0]));
+   var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
       
-   console.log("THIS IS JORDAN: ", answersObject);
+  //  console.log("THIS IS JORDAN: ", answersObject);
    res.render("game",{
       encodedJson : answersObject
      });
