@@ -69,14 +69,10 @@ module.exports = function(app) {
     //stores local cookie with key auth_spotify_id and value of state
     res.cookie("auth_spotify_id", state);
 
-    //Backup Code
-    // var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
-    // + '&response_type=code&redirect_uri=https%3A%2F%2Flit-citadel-55735.herokuapp.com%2Fspotify-callback&scope=user-follow-read&show_dialog=true&state=' + state;
-
     //Change Scope Here (Spotify API) - Current: user-follow-read
 
     var spotify = 'https://accounts.spotify.com/authorize/?client_id=' + process.env.SPOTIFY_ID
-    + '&response_type=code&redirect_uri=https%3A%2F%2Flit-citadel-55735.herokuapp.com%2Fspotify-callback&scope=user-follow-read&show_dialog=true&state=' + state;
+    + '&response_type=code&redirect_uri=https%3A%2F%2Fdancepartysimulator.herokuapp.com%2Fspotify-callback&scope=user-top-read&show_dialog=true&state=' + state;
 
     res.redirect(spotify);
   });
@@ -97,7 +93,7 @@ module.exports = function(app) {
       //POST PARAMETERS - (BODY)
       const postData = querystring.stringify({
         "code": code.toString(),
-        "redirect_uri": "https://lit-citadel-55735.herokuapp.com/spotify-callback",
+        "redirect_uri": "https://dancepartysimulator.herokuapp.com/spotify-callback",
         "grant_type": "authorization_code",
         "client_id": process.env.SPOTIFY_ID,
         "client_secret": process.env.SPOTIFY_SECRET
@@ -127,7 +123,7 @@ module.exports = function(app) {
             var requestTwo = https.request({
               hostname: 'api.spotify.com',
               //Change Path to match Spotify API requirements (If you change Scopes Change this as well based on Spotify API Documentation)
-              path: '/v1/me/following?type=artist',
+              path: '/v1/me/top/tracks',
               method: 'GET',
               headers: {
                 'Authorization': 'Bearer ' + data.access_token
@@ -141,10 +137,27 @@ module.exports = function(app) {
               });
               response.on('end', (chunk) => {
                 //When the response is finished, Display the JSON (Results *** Subject to Change based on How we use the Data ***)
-                res.send(JSON.parse(rawData));
+                var temp = JSON.parse(rawData).items[0].name.toString().split(" ").join("%20");
+                var requestThree = https.request({
+                  hostname: 'www.googleapis.com',
+                  path: '/youtube/v3/search?part=snippet&maxResults=5&key=' + process.env.YOUTUBE_API + '&q=' + temp,
+                  method: 'GET',
+                  json: true
+                }, (response) => {
+                  var rawData = '';
+                  response.on('data', (chunk) => {
+                    rawData += chunk;
+                  });
+                   response.on('end', (chunk) => {
+                    // res.send(JSON.parse(rawData).items[0].id.videoId);
+                    var id = JSON.parse(rawData).items[0].id.videoId + "?autoplay=1"
+                    res.render("spotify", { uri: id });
+                  });
+                });
+                requestThree.end();
+
               });
             });
-
             requestTwo.end();
           });
 
@@ -161,21 +174,21 @@ module.exports = function(app) {
     };
   });
 
-  
+
 
   // Render 404 page for any unmatched routes
   app.get("/game", function(req, res) {
-  
+
     connection.query('SELECT * from posts', function (err, rows, fields) {
       if (err) throw err;
-   var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
-      
-  //  console.log("THIS IS JORDAN: ", answersObject);
-   res.render("game",{
-      encodedJson : answersObject
-     });
-    // res.send("HEY");
-  });
+      var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
+
+       // console.log("THIS IS JORDAN: ", answersObject);
+      res.render("game",{
+        encodedJson : answersObject
+      });
+    });
+
   });
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
