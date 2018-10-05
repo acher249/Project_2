@@ -2,6 +2,8 @@ var db = require("../models");
 const https = require("https");
 const querystring = require('querystring');
 
+var mysql = require('./../config/connection');
+
 require("dotenv").config();
 
 // this is what displays to the user
@@ -14,6 +16,29 @@ module.exports = function(app) {
         examples: dbExamples
       });
     });
+  });
+
+  app.post('/questionaire', function (req, res) {
+
+     var arrayOfAnswers = req.body.answers;
+
+     console.log(arrayOfAnswers);
+
+     var answersSubmitted = {
+         "q1": arrayOfAnswers[0],
+         "q2": arrayOfAnswers[1],
+         "q3": arrayOfAnswers[2],
+         "q4": arrayOfAnswers[3],
+         "q5": arrayOfAnswers[4],
+     }
+
+     mysql.answer(answersSubmitted); //Submiting Form to the Database
+     mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
+
+     console.log(answersSubmitted);
+
+     res.send("Hello World");
+
   });
 
   // Load example page and pass in an example by id
