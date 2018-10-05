@@ -118,23 +118,27 @@
 
 			// initialization
 			init();
+			animate();
+			LoadEqui();
+
+			
 			LoadDancerOne();
 			LoadDancerTwo();
 			LoadDancerThree();
 			animateDancerOne();
 			animateDancerTwo();
 			animateDancerThree();
-			animate();
-			LoadEqui();
 
 
+			// images are called -----  coast, mountains, woods, desert
 			function LoadEqui(){
 
 				var geometry = new THREE.SphereBufferGeometry( 5000, 600, 400 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 				var material = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( 'threeJs/bergsjostolen.jpg' )
+					//if somthing do somthing
+					map: new THREE.TextureLoader().load( 'threeJs/360photos/coast.jpg' )
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
