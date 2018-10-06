@@ -16,12 +16,14 @@ require("dotenv").config();
 module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
-    db.Example.findAll({}).then(function(dbExamples) {
-      res.render("IndexF", {
-        msg: "Welcome!",
-        examples: dbExamples
-      });
-    });
+    // db.Example.findAll({}).then(function(dbExamples) {
+    //   res.render("IndexF", {
+    //     msg: "Welcome!",
+    //     examples: dbExamples
+    //   });
+    // });
+
+    res.render("IndexF");
   });
 
   app.post('/game', function (req, res) {
@@ -35,34 +37,43 @@ module.exports = function(app) {
          "q5": arrayOfAnswers[4],
      }
 
-     mysql.answer(answersSubmitted); //Submiting Form to the Database
+     // mysql.answer(answersSubmitted); //Submiting Form to the Database
      //var answersObject = mysql.ask(); //Replacing the Dummy Data That I sent you Guys [Sam]
+     connection.query('INSERT INTO posts SET ?', answersSubmitted, function (error, results, fields) {
+       console.log("The result is:", results);
+       if (error) throw error;
+       // Neat!
 
-     console.log(answersSubmitted);
+       console.log(answersSubmitted);
+       setImmediate(() => {
+         if(req.body.spotifycheck == undefined) {
+           connection.query('SELECT * from posts', function (err, rows, fields) {
+             if (err) throw err;
+             var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
 
-     if(req.body.spotifycheck == undefined) {
-       connection.query('SELECT * from posts', function (err, rows, fields) {
-         if (err) throw err;
-         var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
+             var song; //youtube video id for the song
+             if(arrayOfAnswers[4] == "1") { song = "DH8StTUCQNY?autoplay=1"; }
+             else if (arrayOfAnswers[4] == "2") { song = "RseaP7zsz6U?autoplay=1"; }
+             else if (arrayOfAnswers[4] == "3") { song = "5dhgWwGbpk0?autoplay=1"; }
+             else if (arrayOfAnswers[4] == "4") { song = "lRSePiyGq_Y?autoplay=1"; }
+             else { song = "lRSePiyGq_Y?autoplay=1" } //old school
 
-         var song; //youtube video id for the song
-         if(arrayOfAnswers[4] === "Salsa") { }
-         else if (arrayOfAnswers[4] === "Ballet") { }
-         else if (arrayOfAnswers[4] === "Breakdance") { }
-         else if (arrayOfAnswers[4] === "Old School") { }
-         else { } //salsa
+              // console.log("THIS IS JORDAN: ", answersObject);
+             res.render("game",{
+               encodedJson : answersObject,
+               youtube: song
+             });
 
-          // console.log("THIS IS JORDAN: ", answersObject);
-         res.render("game",{
-           encodedJson : answersObject //,
-           //youtube: song
-           //NEED TO ADD YOUTUBE LINK OF SALSA MUSIC
-         });
-
+           });
+         } else {
+           res.redirect("/spotify")
+         }
        });
-     } else {
-       res.redirect("/spotify")
-     }
+
+     });
+
+
+
      // console.log("THIS IS JORDAN: ", answersObject);
 
   });
@@ -172,7 +183,7 @@ module.exports = function(app) {
                       var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
 
                        // console.log("THIS IS JORDAN: ", answersObject);
-                      res.render("gameTest",{
+                      res.render("game",{
                         encodedJson : answersObject,
                         youtube: id
                       });
@@ -202,19 +213,19 @@ module.exports = function(app) {
 
 
   // Render 404 page for any unmatched routes
-  app.get("/game", function(req, res) {
-
-    connection.query('SELECT * from posts', function (err, rows, fields) {
-      if (err) throw err;
-      var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
-
-       // console.log("THIS IS JORDAN: ", answersObject);
-      res.render("game",{
-        encodedJson : answersObject
-      });
-    });
-
-  });
+  // app.get("/game", function(req, res) {
+  //
+  //   connection.query('SELECT * from posts', function (err, rows, fields) {
+  //     if (err) throw err;
+  //     var answersObject = encodeURIComponent(JSON.stringify(rows[rows.length-1]));
+  //
+  //      // console.log("THIS IS JORDAN: ", answersObject);
+  //     res.render("game",{
+  //       encodedJson : answersObject
+  //     });
+  //   });
+  //
+  // });
   // Render 404 page for any unmatched routes
   app.get("*", function(req, res) {
     res.render("404");

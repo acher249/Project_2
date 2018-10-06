@@ -10,10 +10,10 @@ connection.connect();
 
 var askQuestion = function () {
    connection.query('SELECT * from posts', function (err, rows, fields) {
-   if (err) throw err;
-
-   console.log('The solution is: ', rows[0]);
-});
+     if (err) throw err;
+     console.log('The solution is: ', rows[0]);
+     return rows[rows.length-1];
+   });
 }
 
 var answer = function(data)
