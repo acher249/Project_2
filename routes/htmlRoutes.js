@@ -24,7 +24,7 @@ module.exports = function(app) {
     });
   });
 
-  app.post('/questionaire', function (req, res) {
+  app.post('/game', function (req, res) {
 
      var arrayOfAnswers = req.body.answers;
      var answersSubmitted = {
