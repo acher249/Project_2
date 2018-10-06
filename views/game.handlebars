@@ -93,14 +93,12 @@
 			var mixers2 = [];
 		    var mixers3 = [];
         
-			//jordan
+			// this gets the data back from the db
 			var decodedJson = decodeURIComponent("{{{encodedJson}}}");
  			var jsonObj = JSON.parse(decodedJson);
 			
 			
 			console.log(jsonObj);
-
-			console.log(jsonObj.q1);
 
 		    //do things
 
@@ -122,34 +120,77 @@
 			// initialization
 			init();
 			animate();
-			LoadEqui();
-			//ChooseDancers();
-
-			LoadDancerOne();
-			LoadDancerTwo();
-			LoadDancerThree();
-			animateDancerOne();
-			animateDancerTwo();
-			animateDancerThree();
+			setTimeout(ChooseDancers, 1000); // to make sure that the data can be sent off and come back in time
+		    setTimeout(LoadEqui, 1000);
 
 			// q1 = Age
 			// q2 = Cake (1-3)
 			// q3 = Fave Number (1-10)
-			// q4 = Party Environment ---- coast, woods, mountains, desert
-			// q5 = Dance Style ---- Salsa, Ballet, Breakdance, Old School
+			// q4 = Party Environment ---- 1-Coast, 2-Woods, 3-Mountains, 4-Desert
+			// q5 = Dance Style ---- 1-Salsa, 2-Ballet, 3-Breakdance, 4-Old School
+			
 
+			// Load One Two or Three Dancers
+			function ChooseDancers(){
 
-			// Example Data: { 'q1': '2', 'q2': '5', 'q3': '5', 'q4': '3', 'q5': '2' }
+				if(jsonObj.q2 === 1 || jsonObj.q2 === 0){
+
+					LoadDancerOne();
+					animateDancerOne();
+
+				}else if (jsonObj.q2 === 2){
+
+					LoadDancerOne();
+					LoadDancerTwo();
+					animateDancerOne();
+					animateDancerTwo();
+
+				}else if (jsonObj.q2 === 3 || jsonObj.q2 > 3){
+
+					LoadDancerOne();
+					LoadDancerTwo();
+					LoadDancerThree();
+					animateDancerOne();
+					animateDancerTwo();
+					animateDancerThree();
+
+				}else{
+					console.log("not an acceptable input");
+				}
+			}
+
+			var environments = ['coast.jpg', 'desert.jpg', 'mountains.jpg', 'woods.jpg'];
+			var currentEnvironment;
 
 			// images are called -----  coast, mountains, woods, desert
 			function LoadEqui(){
+
+				if(jsonObj.q4 === 1 || jsonObj.q4 === 0){
+
+					currentEnvironment = environments[0];
+
+				}else if (jsonObj.q4 === 2){
+
+					currentEnvironment = environments[1];
+
+				}else if (jsonObj.q4 === 3){
+
+					currentEnvironment = environments[2];
+
+				}else if (jsonObj.q4 === 4 || jsonObj.q4 > 4){
+
+					currentEnvironment = environments[3];
+
+				}else{
+					console.log("not an acceptable input");
+				}
 
 				var geometry = new THREE.SphereBufferGeometry( 5000, 600, 400 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 				var material = new THREE.MeshBasicMaterial( {
 					//if somthing do somthing
-					map: new THREE.TextureLoader().load( 'threeJs/360photos/coast.jpg' )
+					map: new THREE.TextureLoader().load( 'threeJs/360photos/' + currentEnvironment )
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -158,12 +199,41 @@
 
 				console.log("Loaded Equi Sphere");
 			}
+
+			var salsaDancers = ['SalsaDancer.fbx', 'SalsaDancer(2).fbx', 'SalsaDancer(3).fbx'];
+			var breakDancers = ['BreakDancer.fbx', 'BreakDancer(2).fbx', 'BreakDancer(3).fbx'];
+			var balletDancers = ['BalletDancer.fbx', 'BalletDancer(2).fbx', 'BalletDancer(3).fbx'];
+			var oldSchoolDancers = ['OldSchoolDancer.fbx', 'OldSchoolDancer(2).fbx', 'OldSchoolDancer(3).fbx'];
+
+			var dancerOne;
+			var dancerTwo;
+			var dancerThree;
+
+			if(jsonObj.q5 === 1 || jsonObj.q5 === 0){ // salsa
+				dancerOne = salsaDancers[0];
+				dancerTwo = salsaDancers[1];
+				dancerThree = salsaDancers[2];
+			}else if(jsonObj.q5 === 2){ // ballet
+				dancerOne = balletDancers[0];
+				dancerTwo = balletDancers[1];
+				dancerThree = balletDancers[2];
+			}else if(jsonObj.q5 === 3){ // break
+				dancerOne = breakDancers[0];
+				dancerTwo = breakDancers[1];
+				dancerThree = breakDancers[2];
+			}else if(jsonObj.q5 === 4){ // old school
+				dancerOne = oldSchoolDancers[0];
+				dancerTwo = oldSchoolDancers[1];
+				dancerThree = oldSchoolDancers[2];
+			}else {
+				console.log("Invalid Input. Only input 1-4");
+			}
 			
 			function LoadDancerOne() {
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/Dancers/BreakDance.fbx', function ( object2 ) {
+				loader.load( './threeJs/Dancers/' + dancerOne, function ( object2 ) {
 					object2.mixer = new THREE.AnimationMixer( object2 );
 					mixers.push( object2.mixer );
 					var action2 = object2.mixer.clipAction( object2.animations[ 0 ] );
@@ -183,7 +253,7 @@
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/Dancers/BreakDance(1).fbx', function ( object2 ) {
+				loader.load( './threeJs/Dancers/' + dancerTwo, function ( object2 ) {
 					object2.mixer = new THREE.AnimationMixer( object2 );
 					mixers2.push( object2.mixer );
 					var action2 = object2.mixer.clipAction( object2.animations[ 0 ] );
@@ -203,7 +273,7 @@
 				
 				// model
 				var loader = new THREE.FBXLoader();
-				loader.load( './threeJs/Dancers/BreakDance(2).fbx', function ( object3 ) {
+				loader.load( './threeJs/Dancers/' + dancerThree, function ( object3 ) {
 					object3.mixer = new THREE.AnimationMixer( object3 );
 					mixers3.push( object3.mixer );
 					var action3 = object3.mixer.clipAction( object3.animations[ 0 ] );
@@ -215,8 +285,8 @@
 						}
 					} );
 					scene.add( object3 );
-					object3.translateZ( -130 );//change position
-					object3.translateX( -140 );
+					object3.translateZ( -200 );//change position
+					object3.translateX( -200 );
 				} );
 			}
 
@@ -321,7 +391,7 @@
 				document.addEventListener( 'keyup', onKeyUp, false );
 				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 				// floor
-				var floorGeometry = new THREE.PlaneBufferGeometry( 400, 400, 20, 20 );
+				var floorGeometry = new THREE.PlaneBufferGeometry( 600, 600, 20, 20 ); //floor size
 				floorGeometry.rotateX( - Math.PI / 2 );
 				//vertex displacement
 				var position = floorGeometry.attributes.position;
@@ -344,7 +414,7 @@
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
 				// objects
-				var boxGeometry = new THREE.BoxBufferGeometry( 15, 15, 15 ); //cube size
+				var boxGeometry = new THREE.BoxBufferGeometry( jsonObj.q3, jsonObj.q3, jsonObj.q3 ); //cube size
 				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
 				position = boxGeometry.attributes.position;
 				colors = [];
@@ -357,9 +427,9 @@
 					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					var box = new THREE.Mesh( boxGeometry, boxMaterial );
-					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.position.x = Math.floor( Math.random() * 20 - 10 ) * jsonObj.q3;
 					box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10 + 220; //move all cubes up
-					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.position.z = Math.floor( Math.random() * 20 - 10 ) * jsonObj.q3;
 					scene.add( box );
 					objects.push( box );
 				}
